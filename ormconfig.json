@@ -1,0 +1,10 @@
+{
+    "type": "mysql",
+    "host": "localhost",
+    "port": 33060,
+    "username": "homestead",
+    "password": "secret",
+    "database": "tokenlab",
+    "entities": ["dist/**/*.entity{.ts,.js}"],
+    "synchronize": false
+}
