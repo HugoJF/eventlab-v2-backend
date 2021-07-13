@@ -8,7 +8,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 export class UsersController {
     constructor(
         @InjectRepository(User)
-        private readonly  users: Repository<User>
+        private readonly users: Repository<User>
     ) {
     }
 

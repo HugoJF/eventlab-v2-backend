@@ -1,10 +1,22 @@
-import {Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post} from '@nestjs/common';
-import {Event} from "./event.entity";
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    NotFoundException,
+    Param,
+    Patch,
+    Post,
+    UseGuards
+} from '@nestjs/common';
 import {EventsService} from "./events.service";
 import {CreateEventDto} from "./dto/create-event-dto";
 import {UpdateEventDto} from "./dto/update-event-dto";
+import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 
 @Controller('events')
+@UseGuards(JwtAuthGuard)
 export class EventsController {
     constructor(
         private readonly events: EventsService
@@ -12,7 +24,7 @@ export class EventsController {
     }
 
     @Get()
-    async index(): Promise<Event[]> {
+    async index() {
         return await this.events.findAll();
     }
 
@@ -39,7 +51,7 @@ export class EventsController {
         if (!event) {
             throw new NotFoundException;
         }
-        
+
         return await this.events.update(id, body);
     }
 

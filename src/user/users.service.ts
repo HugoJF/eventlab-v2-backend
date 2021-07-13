@@ -19,7 +19,22 @@ export class UsersService {
         return this.usersRepository.findOne(id);
     }
 
+    async findByEmail(email: string) {
+        return this.usersRepository.findOne({where: {email: email}})
+    }
+
     async remove(id: string): Promise<void> {
         await this.usersRepository.delete(id);
+    }
+
+    create(param: { password: string; name: string; email: string }) {
+        const data: Partial<User> = {
+            name: param.name,
+            email: param.email,
+            password: param.password, // TODO: bcrypt
+            api_token: param.password,
+        };
+
+        return this.usersRepository.save(data);
     }
 }
