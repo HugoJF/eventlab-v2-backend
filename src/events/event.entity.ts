@@ -3,6 +3,8 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
+    JoinTable,
+    ManyToMany,
     ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn
@@ -20,11 +22,19 @@ export class Event {
     @Column()
     description: string;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, user => user.events)
     @JoinColumn({
         name: 'user_id'
     })
     user: User;
+
+    @ManyToMany(() => User)
+    @JoinTable({
+        name: 'event_user',
+        joinColumn: {name: 'event_id'},
+        inverseJoinColumn: {name: 'user_id'}
+    })
+    participants: User;
 
     @Column()
     starts_at: Date;

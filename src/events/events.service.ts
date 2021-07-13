@@ -18,7 +18,7 @@ export class EventsService {
     }
 
     findOne(id: string): Promise<Event> {
-        return this.events.findOne(id);
+        return this.events.findOne(id, {relations: ['user', 'participants']});
     }
 
     async remove(id: string): Promise<void> {
