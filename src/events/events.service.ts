@@ -1,41 +1,50 @@
-import {Body, Injectable} from '@nestjs/common';
+import {ConflictException, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
+import {FindManyOptions, FindOneOptions, Repository} from 'typeorm';
 import {Event} from "./event.entity";
 import {CreateEventDto} from "./dto/create-event-dto";
 import {UpdateEventDto} from "./dto/update-event-dto";
+import {User} from "../user/user.entity";
 
 @Injectable()
 export class EventsService {
     constructor(
         @InjectRepository(Event)
-        private events: Repository<Event>,
+        private eventsRepository: Repository<Event>,
     ) {
     }
 
-    findAll(): Promise<Event[]> {
-        return this.events.find({relations: ['user']});
+    findAll(options?: FindManyOptions): Promise<Event[]> {
+        return this.eventsRepository.find(options);
     }
 
-    findOne(id: string): Promise<Event> {
-        return this.events.findOne(id, {relations: ['user', 'participants']});
+    findOne(id: string, options?: FindOneOptions): Promise<Event> {
+        return this.eventsRepository.findOne(id, options);
     }
 
     async remove(id: string): Promise<void> {
-        await this.events.delete(id);
+        await this.eventsRepository.delete(id);
     }
 
-    async create(data: CreateEventDto) {
-        return await this.events.save({
-            ...data,
-            starts_at: '2021-05-13 19:22:01',
-            ends_at: '2021-05-13 19:22:01',
-            created_at: '2021-05-13 19:22:01',
-        })
+    async create(user: User, data: CreateEventDto) {
+        const now = new Date;
+        if (data.starts_at < now) {
+            throw new ConflictException();
+        }
+        if (data.ends_at < now) {
+            throw new ConflictException();
+        }
+        if (data.starts_at > data.ends_at) {
+            throw new ConflictException()
+        }
+
+        return await this.eventsRepository.save(this.eventsRepository.create({
+            ...data, user
+        }))
     }
 
     async update(id: string, body: UpdateEventDto) {
-        await this.events.update(id, body);
+        await this.eventsRepository.update(id, body);
 
         return await this.findOne(id);
     }

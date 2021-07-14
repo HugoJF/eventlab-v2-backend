@@ -8,34 +8,39 @@ import {
     Param,
     Patch,
     Post,
+    Request,
     UseGuards
 } from '@nestjs/common';
 import {EventsService} from "./events.service";
 import {CreateEventDto} from "./dto/create-event-dto";
 import {UpdateEventDto} from "./dto/update-event-dto";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
+import {UsersService} from "../user/users.service";
 
 @Controller('events')
 @UseGuards(JwtAuthGuard)
 export class EventsController {
     constructor(
-        private readonly events: EventsService
+        private readonly events: EventsService,
+        private readonly users: UsersService,
     ) {
     }
 
     @Get()
     async index() {
-        return await this.events.findAll();
+        return await this.events.findAll({relations: ['user', 'participants']});
     }
 
     @Post()
-    async store(@Body() data: CreateEventDto) {
-        return await this.events.create(data);
+    async store(@Request() request, data: CreateEventDto) {
+        const user = await this.users.findOne(request.user.sub, {relations: ['user', 'participants']});
+
+        return await this.events.create(user, data);
     }
 
     @Get(':id')
     async show(@Param('id') id: string) {
-        const event = await this.events.findOne(id);
+        const event = await this.events.findOne(id, {relations: ['user', 'participants']});
 
         if (!event) {
             throw new NotFoundException;

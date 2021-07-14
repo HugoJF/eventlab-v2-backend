@@ -6,5 +6,5 @@
     "password": "secret",
     "database": "tokenlab",
     "entities": ["dist/**/*.entity{.ts,.js}"],
-    "synchronize": false
+    "logging": ["query"]
 }

@@ -1,5 +1,4 @@
-import {IsNotEmpty} from 'class-validator';
-import {Column} from "typeorm";
+import {IsDate, IsDateString, IsNotEmpty, MinDate} from 'class-validator';
 
 export class CreateEventDto {
     @IsNotEmpty()
@@ -8,9 +7,11 @@ export class CreateEventDto {
     @IsNotEmpty()
     description: string;
 
-    @Column()
+    @IsNotEmpty()
+    @IsDateString()
     starts_at: Date;
 
-    @Column()
+    @IsNotEmpty()
+    @IsDateString()
     ends_at: Date;
 }

@@ -42,9 +42,9 @@ export class Event {
     @Column()
     ends_at: Date;
 
-    @CreateDateColumn()
+    @CreateDateColumn({type: 'timestamp', name: 'created_at'})
     created_at: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({type: 'timestamp'})
     updated_at: Date;
 }
