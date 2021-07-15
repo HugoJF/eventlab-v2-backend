@@ -34,7 +34,7 @@ export class Event {
         joinColumn: {name: 'event_id'},
         inverseJoinColumn: {name: 'user_id'}
     })
-    participants: User;
+    participants: User[];
 
     @Column()
     starts_at: Date;

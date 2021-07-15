@@ -1,4 +1,4 @@
-import {ConflictException, Injectable} from '@nestjs/common';
+import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {FindManyOptions, FindOneOptions, Repository} from 'typeorm';
 import {Event} from "./event.entity";
@@ -20,6 +20,16 @@ export class EventsService {
 
     findOne(id: string, options?: FindOneOptions): Promise<Event> {
         return this.eventsRepository.findOne(id, options);
+    }
+
+    async findOneOrNotFound(id: string, options?: FindOneOptions): Promise<Event> {
+        const event = await this.findOne(id, options);
+
+        if (!event) {
+            throw new NotFoundException;
+        }
+
+        return event;
     }
 
     async remove(id: string): Promise<void> {

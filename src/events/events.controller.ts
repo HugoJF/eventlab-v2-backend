@@ -40,22 +40,13 @@ export class EventsController {
 
     @Get(':id')
     async show(@Param('id') id: string) {
-        const event = await this.events.findOne(id, {relations: ['user', 'participants']});
-
-        if (!event) {
-            throw new NotFoundException;
-        }
-
-        return event;
+        return await this.events.findOneOrNotFound(id, {relations: ['user', 'participants']});
     }
 
     @Patch(':id')
     async update(@Param('id') id: string, @Body() body: UpdateEventDto) {
-        const event = await this.events.findOne(id);
-
-        if (!event) {
-            throw new NotFoundException;
-        }
+        // TODO: is this even needed?
+        const event = await this.events.findOneOrNotFound(id);
 
         return await this.events.update(id, body);
     }
