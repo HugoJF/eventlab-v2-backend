@@ -32,12 +32,11 @@ export class UsersService {
         await this.usersRepository.delete(id);
     }
 
-    create(param: { password: string; name: string; email: string }) {
+    create(param: Partial<User>) {
         const data: Partial<User> = {
             name: param.name,
             email: param.email,
-            password: param.password, // TODO: bcrypt
-            api_token: param.password,
+            password: param.password,
         };
 
         return this.usersRepository.save(data);

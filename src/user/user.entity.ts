@@ -15,7 +15,7 @@ import {Event} from "../events/event.entity";
 @Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: string;
 
     @Column()
     name: string;

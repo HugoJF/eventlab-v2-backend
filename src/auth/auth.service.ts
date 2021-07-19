@@ -3,6 +3,9 @@ import {UsersService} from "../user/users.service";
 import {JwtService} from "@nestjs/jwt";
 import {User} from "../user/user.entity";
 import {RegisterUserDto} from "./dto/register-user-dto";
+import * as bcrypt from 'bcrypt';
+
+const SALT_ROUNDS = 10;
 
 @Injectable()
 export class AuthService {
@@ -14,10 +17,8 @@ export class AuthService {
 
     async validateUser(username: string, pass: string): Promise<any> {
         const user = await this.users.findByEmail(username);
-        if (user && user.api_token === pass) {
-            // TODO: class transformer should take care of this
-            const {password, ...result} = user;
-            return result;
+        if (user && await bcrypt.compare(pass, user.password)) {
+            return user;
         }
         return null;
     }
@@ -36,10 +37,12 @@ export class AuthService {
             throw new ConflictException()
         }
 
-        return this.users.create({
+        const saved = await this.users.create({
             name: body.name,
             email: body.email,
-            password: body.password,
-        })
+            password: await bcrypt.hash(body.password, SALT_ROUNDS),
+        });
+
+        return await this.users.findOne(saved.id);
     }
 }
