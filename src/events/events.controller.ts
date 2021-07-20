@@ -32,8 +32,8 @@ export class EventsController {
     }
 
     @Post()
-    async store(@Request() request, data: CreateEventDto) {
-        const user = await this.users.findOne(request.user.sub, {relations: ['user', 'participants']});
+    async store(@Request() request, @Body() data: CreateEventDto) {
+        const user = await this.users.findOne(request.user.sub);
 
         return await this.events.create(user, data);
     }

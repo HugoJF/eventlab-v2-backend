@@ -33,6 +33,10 @@ export class EventsService {
     }
 
     async remove(id: string): Promise<void> {
+        // deal with non cascading tables
+        const event = await this.eventsRepository.findOne(id);
+        event.participants = [];
+        await this.eventsRepository.save(event);
         await this.eventsRepository.delete(id);
     }
 
