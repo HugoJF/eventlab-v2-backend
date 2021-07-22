@@ -23,24 +23,24 @@ export class User {
     @Column()
     email: string;
 
-    @Column()
-    email_verified_at: Date;
+    @Column({nullable: true, default: null})
+    email_verified_at: Date|null;
 
     @Column()
     @Exclude()
     password: string;
 
-    @Column()
-    api_token: string;
+    @Column({nullable: true, default: null})
+    api_token: string|null;
 
-    @Column()
-    two_factor_secret: string;
+    @Column({nullable: true, default: null})
+    two_factor_secret: string|null;
 
-    @Column()
-    two_factor_recovery_codes: string;
+    @Column({nullable: true, default: null})
+    two_factor_recovery_codes: string|null;
 
-    @Column()
-    remember_token: string;
+    @Column({nullable: true, default: null})
+    remember_token: string|null;
 
     @CreateDateColumn()
     created_at: Date;
