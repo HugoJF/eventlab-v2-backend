@@ -23,4 +23,4 @@ ENV TYPEORM_ENTITIES=${TYPEORM_ENTITIES:-"dist/**/*.entity.ts,dist/**/*.entity.j
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "start"]
+CMD [ "npm", "run", "start:prod"]
