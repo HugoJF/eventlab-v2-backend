@@ -14,6 +14,6 @@ export class UsersController {
 
     @Get('health')
     async health() {
-        return 'Running!';
+        return 'We healthy';
     }
 }
