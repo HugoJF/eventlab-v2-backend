@@ -12,11 +12,6 @@ export class UsersController {
     ) {
     }
 
-    @Get()
-    async getHello(): Promise<string> {
-        return JSON.stringify(await this.users.find());
-    }
-
     @Get('health')
     async health() {
         return 'Running!';
