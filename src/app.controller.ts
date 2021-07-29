@@ -1,4 +1,4 @@
-import {Controller} from '@nestjs/common';
+import {Controller, Get} from '@nestjs/common';
 import {AppService} from './app.service';
 
 @Controller()
@@ -7,7 +7,7 @@ export class AppController {
         private readonly appService: AppService,
     ) {
     }
-    
+
     @Get('health')
     async health() {
         return 'We healthy';
