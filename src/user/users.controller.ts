@@ -11,9 +11,4 @@ export class UsersController {
         private readonly users: Repository<User>
     ) {
     }
-
-    @Get('health')
-    async health() {
-        return 'We healthy';
-    }
 }

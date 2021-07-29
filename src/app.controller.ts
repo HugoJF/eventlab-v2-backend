@@ -7,4 +7,9 @@ export class AppController {
         private readonly appService: AppService,
     ) {
     }
+    
+    @Get('health')
+    async health() {
+        return 'We healthy';
+    }
 }
