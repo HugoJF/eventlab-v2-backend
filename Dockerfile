@@ -2,25 +2,27 @@ FROM node:fermium-slim
 
 WORKDIR /usr/src/app
 
+RUN apt-get update
+RUN apt-get upgrade
+RUN apt-get install -y curl
+
 COPY package*.json ./
 COPY src src
 COPY nest-cli.json .
 COPY tsconfig.build.json .
 COPY tsconfig.json .
+COPY ormconfig.js .
 
-RUN npm install
+RUN npm ci
 RUN npm run build
-RUN apt-get update
-RUN apt-get upgrade
-RUN apt-get install -y curl
 
-ENV TYPEORM_CONNECTION=${TYPEORM_CONNECTION:-mysql}
-ENV TYPEORM_HOST=${TYPEORM_HOST:-172.17.0.1}
-ENV TYPEORM_USERNAME=${TYPEORM_USERNAME:-root}
-ENV TYPEORM_PASSWORD=${TYPEORM_PASSWORD:-admin}
-ENV TYPEORM_DATABASE=${TYPEORM_DATABASE:-test}
-ENV TYPEORM_PORT=${TYPEORM_PORT:-3306}
-ENV TYPEORM_SYNCHRONIZE=${TYPEORM_SYNCHRONIZE:-true}
+ENV DB_CONNECTION=${DB_CONNECTION:-mysql}
+ENV DB_HOST=${DB_HOST:-172.17.0.1}
+ENV DB_USERNAME=${DB_USERNAME:-root}
+ENV DB_PASSWORD=${DB_PASSWORD:-admin}
+ENV DB_DATABASE=${DB_DATABASE:-test}
+ENV DB_PORT=${DB_PORT:-3306}
+ENV DB_SYNCHRONIZE=${DB_SYNCHRONIZE:-true}
 
 EXPOSE 3000
 
