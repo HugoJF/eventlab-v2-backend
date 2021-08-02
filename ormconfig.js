@@ -4,8 +4,11 @@ module.exports = {
     "port": process.env.DB_PORT || 3306,
     "username": process.env.DB_USERNAME || "root",
     "password": process.env.DB_PASSWORD || "secret",
-    "database": process.env.DB_DATABASE || "test",
-    "entities": ["./dist/**/*.entity.ts", "./dist/**/*.entity.js"],
+    "database": process.env.DB_DATABASE || "eventlab",
+    "entities": [
+        "./dist/**/*.entity.ts", "./dist/**/*.entity.js",
+        "./.build/**/*.entity.ts", "./.build/**/*.entity.js",
+    ],
     "synchronize": process.env.DB_SYNCHRONIZE || true,
     "logging": ["query"]
 }
