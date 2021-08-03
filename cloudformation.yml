@@ -1,0 +1,238 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: The AWS CloudFormation template for this Serverless application
+Resources:
+  ServerlessDeploymentBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+  ServerlessDeploymentBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref ServerlessDeploymentBucket
+      PolicyDocument:
+        Statement:
+          - Action: 's3:*'
+            Effect: Deny
+            Principal: '*'
+            Resource:
+              - !Join
+                - ''
+                - - 'arn:'
+                  - !Ref 'AWS::Partition'
+                  - ':s3:::'
+                  - !Ref ServerlessDeploymentBucket
+                  - /*
+              - !Join
+                - ''
+                - - 'arn:'
+                  - !Ref 'AWS::Partition'
+                  - ':s3:::'
+                  - !Ref ServerlessDeploymentBucket
+            Condition:
+              Bool:
+                'aws:SecureTransport': false
+  HelloLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: /aws/lambda/lambda-alias-deploy-dev-hello
+  IamRoleLambdaExecution:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: !Join
+            - '-'
+            - - lambda-alias-deploy
+              - dev
+              - lambda
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogStream'
+                  - 'logs:CreateLogGroup'
+                Resource:
+                  - !Sub >-
+                    arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/lambda-alias-deploy-dev*:*
+              - Effect: Allow
+                Action:
+                  - 'logs:PutLogEvents'
+                Resource:
+                  - !Sub >-
+                    arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/lambda-alias-deploy-dev*:*:*
+              - Effect: Allow
+                Action:
+                  - 'codedeploy:*'
+                Resource:
+                  - '*'
+      Path: /
+      RoleName: !Join
+        - '-'
+        - - lambda-alias-deploy
+          - dev
+          - !Ref 'AWS::Region'
+          - lambdaRole
+  HelloLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code: ./code.zip
+      Handler: handler.hello
+      Runtime: nodejs14.x
+      FunctionName: lambda-alias-deploy-dev-hello
+      MemorySize: 1024
+      Timeout: 6
+      Role: !GetAtt
+        - IamRoleLambdaExecution
+        - Arn
+    DependsOn:
+      - HelloLogGroup
+  HelloLambdaVersionWithAnotherName:
+    Type: 'AWS::Lambda::Version'
+    DeletionPolicy: Retain
+    Properties:
+      FunctionName: !Ref HelloLambdaFunction
+  HttpApi:
+    Type: 'AWS::ApiGatewayV2::Api'
+    Properties:
+      Name: dev-lambda-alias-deploy
+      ProtocolType: HTTP
+  HttpApiStage:
+    Type: 'AWS::ApiGatewayV2::Stage'
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: $default
+      AutoDeploy: true
+      DefaultRouteSettings:
+        DetailedMetricsEnabled: false
+  HelloLambdaPermissionHttpApi:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !Ref HelloLambdaFunctionAliasLive
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Join
+        - ''
+        - - 'arn:'
+          - !Ref 'AWS::Partition'
+          - ':execute-api:'
+          - !Ref 'AWS::Region'
+          - ':'
+          - !Ref 'AWS::AccountId'
+          - ':'
+          - !Ref HttpApi
+          - /*
+  HttpApiIntegrationHello:
+    Type: 'AWS::ApiGatewayV2::Integration'
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Join
+        - ''
+        - - 'arn:'
+          - !Ref 'AWS::Partition'
+          - ':apigateway:'
+          - !Ref 'AWS::Region'
+          - ':lambda:path/2015-03-31/functions/'
+          - !Ref HelloLambdaFunctionAliasLive
+          - /invocations
+      PayloadFormatVersion: '2.0'
+      TimeoutInMillis: 6500
+  HttpApiRouteGetHello:
+    Type: 'AWS::ApiGatewayV2::Route'
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: GET /hello
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref HttpApiIntegrationHello
+    DependsOn: HttpApiIntegrationHello
+  LambdaaliasdeploydevDeploymentApplication:
+    Type: 'AWS::CodeDeploy::Application'
+    Properties:
+      ComputePlatform: Lambda
+  CodeDeployServiceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambdaLimited'
+        - 'arn:aws:iam::aws:policy/AWSLambda_FullAccess'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - codedeploy.amazonaws.com
+  HelloLambdaFunctionDeploymentGroup:
+    Type: 'AWS::CodeDeploy::DeploymentGroup'
+    Properties:
+      ApplicationName: !Ref LambdaaliasdeploydevDeploymentApplication
+      AutoRollbackConfiguration:
+        Enabled: true
+        Events:
+          - DEPLOYMENT_FAILURE
+          - DEPLOYMENT_STOP_ON_ALARM
+          - DEPLOYMENT_STOP_ON_REQUEST
+      DeploymentConfigName: !Sub
+        - 'CodeDeployDefault.Lambda${ConfigName}'
+        - ConfigName: AllAtOnce
+      DeploymentStyle:
+        DeploymentType: BLUE_GREEN
+        DeploymentOption: WITH_TRAFFIC_CONTROL
+      ServiceRoleArn: !GetAtt
+        - CodeDeployServiceRole
+        - Arn
+  HelloLambdaFunctionAliasLive:
+    Type: 'AWS::Lambda::Alias'
+    Properties:
+      FunctionVersion: !GetAtt
+        - HelloLambdaVersionWithAnotherName
+        - Version
+      FunctionName: !Ref HelloLambdaFunction
+      Name: Live
+    UpdatePolicy:
+      CodeDeployLambdaAliasUpdate:
+        ApplicationName: !Ref LambdaaliasdeploydevDeploymentApplication
+        DeploymentGroupName: !Ref HelloLambdaFunctionDeploymentGroup
+Outputs:
+  ServerlessDeploymentBucketName:
+    Value: !Ref ServerlessDeploymentBucket
+    Export:
+      Name: sls-lambda-alias-deploy-dev-ServerlessDeploymentBucketName
+  HelloLambdaFunctionQualifiedArn:
+    Description: Current Lambda function version
+    Value: !Ref HelloLambdaVersionWithAnotherName
+    Export:
+      Name: sls-lambda-alias-deploy-dev-HelloLambdaFunctionQualifiedArn
+  HttpApiId:
+    Description: Id of the HTTP API
+    Value: !Ref HttpApi
+    Export:
+      Name: sls-lambda-alias-deploy-dev-HttpApiId
+  HttpApiUrl:
+    Description: URL of the HTTP API
+    Value: !Join
+      - ''
+      - - 'https://'
+        - !Ref HttpApi
+        - .execute-api.
+        - !Ref 'AWS::Region'
+        - .
+        - !Ref 'AWS::URLSuffix'
+    Export:
+      Name: sls-lambda-alias-deploy-dev-HttpApiUrl
