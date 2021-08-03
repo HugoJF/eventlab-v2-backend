@@ -5,7 +5,7 @@ phases:
     commands:
       - npm install
       - npx serverless package
-      - mv serverless/cloudformation-template-update-stack.json packaged.json
+      - mv .serverless/cloudformation-template-update-stack.json packaged.json
 
 artifacts:
   files:
