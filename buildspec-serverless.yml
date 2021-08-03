@@ -4,8 +4,9 @@ phases:
   build:
     commands:
       - npm install
+      - sls package
+      - mv serverless/cloudformation-template-update-stack.json packaged.json
 
 artifacts:
   files:
-    - dist/**/*
-    - ormconfig.js
+    - packaged.json
