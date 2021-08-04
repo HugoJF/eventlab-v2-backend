@@ -4,8 +4,8 @@ phases:
   build:
     commands:
       - npm install
-      - npm run build
-      - zip -qr code.zip dist node_modules ormconfig.js
+      - npx serverless package
+      - mv .serverless/eventlab-v2.zip code.zip
       - aws cloudformation package --template-file cloudformation.yml --s3-bucket aws-cloudformation-package-cli --output-template-file packaged.yml
 
 artifacts:
