@@ -105,8 +105,8 @@ Resources:
       Handler: src/lambda.handler
       Runtime: nodejs14.x
       FunctionName: lambda-alias-deploy-dev-hello
-      MemorySize: 1024
-      Timeout: 6
+      MemorySize: 256
+      Timeout: 3
       Environment:
         Variables:
           DB_HOST: !GetAtt RDS.Endpoint.Address
