@@ -88,7 +88,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Code: ./code.zip
-      Handler: handler.hello
+      Handler: dist/lambda.handler
       Runtime: nodejs14.x
       FunctionName: lambda-alias-deploy-dev-hello
       MemorySize: 1024
@@ -153,7 +153,7 @@ Resources:
     Type: 'AWS::ApiGatewayV2::Route'
     Properties:
       ApiId: !Ref HttpApi
-      RouteKey: GET /hello
+      RouteKey: $default
       Target: !Join
         - /
         - - integrations

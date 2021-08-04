@@ -19,6 +19,4 @@ functions:
     # The module 'handler' is exported in the file 'src/lambda'
     handler: src/lambda.handler
     events:
-      - http:
-          method: any
-          path: /{any+}
+      - httpApi: '*'
