@@ -88,8 +88,8 @@ Resources:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Delete # Avoid slow deletions since this is not a production template
     Properties:
-      DBInstanceIdentifier: !Ref DBInstanceID
-      DBName: !Ref DBName
+      DBInstanceIdentifier: eventlab
+      DBName: eventlab
       DBInstanceClass: db.t2.micro
       AllocatedStorage: 20
       BackupRetentionPeriod: 0 # Disable backups
@@ -112,6 +112,7 @@ Resources:
           DB_HOST: !GetAtt RDS.Endpoint.Address
           DB_USERNAME: eventlab
           DB_PASSWORD: eventlab
+          DB_DATABASE: eventlab
       Role: !GetAtt
         - IamRoleLambdaExecution
         - Arn
