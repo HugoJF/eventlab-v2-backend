@@ -5,6 +5,7 @@ plugins:
   - serverless-plugin-typescript
 #  - serverless-plugin-optimize
   - serverless-offline
+  - serverless-plugin-canary-deployments
 
 custom:
   serverless-offline:
@@ -24,3 +25,6 @@ functions:
     handler: src/lambda.handler
     events:
       - httpApi: '*'
+    deploymentSettings:
+      type: Linear10PercentEvery1Minute
+      alias: Live
