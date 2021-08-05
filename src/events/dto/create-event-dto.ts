@@ -1,4 +1,5 @@
 import {IsDate, IsDateString, IsNotEmpty, MinDate} from 'class-validator';
+import {Type} from "class-transformer";
 
 export class CreateEventDto {
     @IsNotEmpty()
@@ -8,10 +9,10 @@ export class CreateEventDto {
     description: string;
 
     @IsNotEmpty()
-    @IsDateString()
+    @Type(() => Date)
     starts_at: Date;
 
     @IsNotEmpty()
-    @IsDateString()
+    @Type(() => Date)
     ends_at: Date;
 }
