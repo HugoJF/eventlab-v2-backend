@@ -6,8 +6,9 @@ phases:
       - npm install
       - npx serverless package
       - mv .serverless/eventlab-v2.zip code.zip
+      - export HASH=`md5sum serverless.yaml | awk '{print substr($1, 1, 20)}'`
+      - sed -i -e "s|__VERSIONHASH__|$HASH|g" cloudformation.yml
       - aws cloudformation package --template-file cloudformation.yml --s3-bucket aws-cloudformation-package-cli --output-template-file packaged.yml
-
 artifacts:
   files:
     - packaged.yml

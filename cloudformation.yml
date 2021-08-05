@@ -119,7 +119,7 @@ Resources:
     DependsOn:
       - HelloLogGroup
       - RDS
-  HelloLambdaVersionWithAnotherName:
+  HelloLambdaVersion__VERSIONHASH__:
     Type: 'AWS::Lambda::Version'
     DeletionPolicy: Retain
     Properties:
@@ -222,7 +222,7 @@ Resources:
     Type: 'AWS::Lambda::Alias'
     Properties:
       FunctionVersion: !GetAtt
-        - HelloLambdaVersionWithAnotherName
+        - HelloLambdaVersion__VERSIONHASH__
         - Version
       FunctionName: !Ref HelloLambdaFunction
       Name: Live
@@ -237,7 +237,7 @@ Outputs:
       Name: sls-lambda-alias-deploy-dev-ServerlessDeploymentBucketName
   HelloLambdaFunctionQualifiedArn:
     Description: Current Lambda function version
-    Value: !Ref HelloLambdaVersionWithAnotherName
+    Value: !Ref HelloLambdaVersion__VERSIONHASH__
     Export:
       Name: sls-lambda-alias-deploy-dev-HelloLambdaFunctionQualifiedArn
   HttpApiId:
