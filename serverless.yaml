@@ -11,10 +11,6 @@ custom:
   serverless-offline:
     noPrependStageInUrl: true
 
-package:
-  include:
-    - ormconfig.js
-
 provider:
   name: aws
   runtime: nodejs12.x

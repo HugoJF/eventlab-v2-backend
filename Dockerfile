@@ -11,7 +11,6 @@ COPY src src
 COPY nest-cli.json .
 COPY tsconfig.build.json .
 COPY tsconfig.json .
-COPY ormconfig.js .
 
 RUN npm ci
 RUN npm run build
