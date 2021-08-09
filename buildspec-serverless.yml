@@ -3,10 +3,8 @@ version: 0.2
 phases:
   build:
     commands:
-      - docker run --name mysql -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=eventlab -p 33060:3306 -d mysql:latest
+      - docker-compose up --build --exit-code-from nest
       - npm install
-      - npm install -g cross-env
-      - npm run test
       - npx serverless package
       - mv .serverless/eventlab-v2.zip code.zip
       - export HASH=`md5sum code.zip | awk '{print substr($1, 1, 20)}'`
