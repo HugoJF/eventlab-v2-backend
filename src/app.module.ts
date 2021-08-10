@@ -7,6 +7,9 @@ import {EventsModule} from "./events/events.module";
 import {AuthModule} from './auth/auth.module';
 import {Event} from "./events/event.entity";
 import {User} from "./user/user.entity";
+import {CreateUsersTable1628606392441} from "./migrations/1628606392441-CreateUsersTable";
+import {CreateEventsTable1628607058600} from "./migrations/1628607058600-CreateEventsTable";
+import {CreateEventUserTable1628609799749} from "./migrations/1628609799749-CreateEventUserTable";
 
 const TYPEORM_CONFIG: TypeOrmModuleOptions = {
     type: "mysql",
@@ -16,8 +19,14 @@ const TYPEORM_CONFIG: TypeOrmModuleOptions = {
     password: process.env.DB_PASSWORD || "secret",
     database: process.env.DB_DATABASE || "eventlab",
     entities: [Event, User],
-    synchronize: true, // TODO: use migrations
-    // logging: ["query"]
+    migrations: [
+        CreateUsersTable1628606392441,
+        CreateEventsTable1628607058600,
+        CreateEventUserTable1628609799749
+    ],
+    migrationsRun: true,
+    synchronize: false, // TODO: use migrations
+    logging: ['migration']
 }
 
 @Module({
