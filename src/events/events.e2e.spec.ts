@@ -9,23 +9,27 @@ import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 describe('EventsController', () => {
     let app: INestApplication;
 
-    const eventBody = {
+    const eventBase = {
         title: 'My title',
         description: 'My description',
+        user_id: 1,
         starts_at: subDays(new Date, 5).toISOString(),
-        ends_at: subDays(new Date, 2).toISOString()
+        ends_at: subDays(new Date, 2).toISOString(),
+        created_at: (new Date).toISOString(),
+        updated_at: (new Date).toISOString(),
     }
 
-    const eventUpdate = {
+    const eventChanges = {
         description: 'New description',
     }
 
-    const eventFinal = {...eventBody, ...eventUpdate};
+    const eventUpdated = {...eventBase, ...eventChanges};
 
     beforeAll(async () => {
-        const moduleRef = await Test.createTestingModule({
-            imports: [AppModule],
-        })
+        const moduleRef = await Test
+            .createTestingModule({
+                imports: [AppModule],
+            })
             .overrideGuard(JwtAuthGuard)
             .useValue({
                 canActivate: (context: ExecutionContext) => {
@@ -37,47 +41,52 @@ describe('EventsController', () => {
             .compile();
 
         app = moduleRef.createNestApplication();
-        await getConnection().synchronize(true); // wipe database
+
+        // Wipe database
+        await getConnection().dropDatabase();
+        await getConnection().runMigrations();
+
+        // Init application
         await app.init();
     });
 
-    it(`/GET health`, () => {
+    it('GET /health - returns expected string', () =>
         request(app.getHttpServer())
             .get('/health')
             .expect(200)
-            .expect('We healthy');
-    });
+            .expect('We healthy')
+    );
 
-    it('/POST events', () => {
+    it('POST events - returns HTTP 201', () =>
         request(app.getHttpServer())
             .post('/events')
-            .send(eventBody)
-            .expect(201);
-    });
+            .send(eventBase)
+            .expect(201)
+    );
 
-    it('/GET events', () => {
+    it('GET /events - returns the created event', () =>
         request(app.getHttpServer())
             .get('/events')
             .expect(200)
             .expect(value => {
                 if (value.body.length !== 1) throw new Error('Could not find event stored in database');
             })
-    });
+    );
 
-    it('/PATCH event', () => {
+    it('PATCH /event - updates created event', () =>
         request(app.getHttpServer())
             .patch('/events/1')
-            .send(eventUpdate)
-            .expect(200, eventFinal);
-    });
+            .send(eventChanges)
+            .expect(200, eventUpdated)
+    );
 
-    it('/DELETE event', () => {
+    it('DELETE /event - deletes created event', () =>
         request(app.getHttpServer())
             .delete('/events/1')
             .expect(200)
-    });
+    );
 
-    afterAll(async () => {
-        await app.close();
-    });
+    afterAll(async () =>
+        await app.close()
+    );
 });
