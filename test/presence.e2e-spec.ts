@@ -37,15 +37,13 @@ describe('PresenceController', () => {
         await getConnection().runMigrations();
 
         // Setup typeorm-seeding
-        await useSeeding({
-            connection: 'default',
-        });
+        await useSeeding();
 
         // Create user that is "authenticated"
         const user = await factory(User)().create();
 
         // Create event
-        const event = await factory(Event)().create({
+        await factory(Event)().create({
             user
         });
 
@@ -56,7 +54,7 @@ describe('PresenceController', () => {
     it('POST /events/:id/presence - joins event', async () => {
         // TODO: validate database has presence
         await request(app.getHttpServer())
-            .post('/events/1/presence')
+            .post('/events/1/presence') // TODO: use actual ID
             .expect(201)
     });
 

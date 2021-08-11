@@ -1,6 +1,6 @@
 import request from 'supertest';
 import {Test} from '@nestjs/testing';
-import {ExecutionContext, INestApplication} from '@nestjs/common';
+import {INestApplication} from '@nestjs/common';
 import {getConnection} from "typeorm";
 import {AppModule} from "../src/app.module";
 
@@ -27,7 +27,7 @@ describe('AuthController', () => {
     it('POST /register - register', async () => {
         await request(app.getHttpServer())
             .post('/auth/register')
-            .send({
+            .send({ // TODO: generate data using factory
                 name: 'User name',
                 email: 'asd@asd.com',
                 password: '123123123',

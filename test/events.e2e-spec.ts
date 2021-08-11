@@ -59,12 +59,10 @@ describe('EventsController', () => {
         await getConnection().runMigrations();
 
         // Setup typeorm-seeding
-        await useSeeding({
-            connection: 'default',
-        });
+        await useSeeding();
 
         // Create user that is "authenticated"
-        const user = await factory(User)().create();
+        await factory(User)().create();
 
         // Init application
         await app.init();
@@ -92,12 +90,11 @@ describe('EventsController', () => {
     });
 
     it('GET /events - returns the created event', async () => {
-        await request(app.getHttpServer())
+        const response = await request(app.getHttpServer())
             .get('/events')
             .expect(200)
-            .expect(value => {
-                if (value.body.length !== 1) throw new Error('Could not find event stored in database');
-            })
+
+        expect(response.body.length).toStrictEqual(1)
     });
 
     it('PATCH /event - updates created event', async () => {
