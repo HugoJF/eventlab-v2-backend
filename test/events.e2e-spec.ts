@@ -15,10 +15,10 @@ describe('EventsController', () => {
     let app: INestApplication;
 
     const startsAt = subDays(new Date, 5);
-    startsAt.setMilliseconds(0);
+    startsAt.setMilliseconds(0); // MySQL does not store milliseconds for timestamps
 
     const endsAt = subDays(new Date, 2);
-    endsAt.setMilliseconds(0);
+    endsAt.setMilliseconds(0); // MySQL does not store milliseconds for timestamps
 
     const eventBase = {
         title: 'My title',
@@ -26,11 +26,15 @@ describe('EventsController', () => {
         starts_at: startsAt.toISOString(),
         ends_at: endsAt.toISOString(),
     }
-
+    const eventFlippedDates = {
+        title: 'I have invalid data',
+        description: 'And will throw an error (hopefully)',
+        starts_at: endsAt.toISOString(),
+        ends_at: startsAt.toISOString(),
+    }
     const eventChanges = {
         description: 'New description',
     }
-
     const eventUpdated = {...eventBase, ...eventChanges};
 
     beforeAll(async () => {
@@ -73,11 +77,18 @@ describe('EventsController', () => {
             .expect('We healthy')
     });
 
-    it('POST events - returns HTTP 201', async () => {
+    it('POST /events - returns HTTP 201', async () => {
         await request(app.getHttpServer())
             .post('/events')
             .send(eventBase)
             .expect(201)
+    });
+
+    it('POST /events - starts_at after ends_at will throw BadRequest', async () => {
+        await request(app.getHttpServer())
+            .post('/events')
+            .send(eventFlippedDates)
+            .expect(400)
     });
 
     it('GET /events - returns the created event', async () => {
