@@ -2,7 +2,7 @@ import request from 'supertest';
 import {Test} from '@nestjs/testing';
 import {ExecutionContext, INestApplication} from '@nestjs/common';
 import {getConnection} from "typeorm";
-import {AppModule} from "../app.module";
+import {AppModule} from "../src/app.module";
 
 describe('AuthController', () => {
     let app: INestApplication;

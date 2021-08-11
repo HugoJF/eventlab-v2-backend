@@ -1,16 +1,16 @@
 import request from 'supertest';
 import {Test} from '@nestjs/testing';
 import {ExecutionContext, INestApplication} from '@nestjs/common';
-import {AppModule} from "../../app.module";
+import {AppModule} from "../src/app.module";
 import {getConnection} from "typeorm";
-import {JwtAuthGuard} from "../../auth/jwt-auth.guard";
+import {JwtAuthGuard} from "../src/auth/jwt-auth.guard";
 import {factory, useSeeding} from "typeorm-seeding";
-import {User} from "../../user/user.entity";
-import {Event} from '../event.entity';
+import {User} from "../src/user/user.entity";
+import {Event} from '../src/events/event.entity';
 // Instead of using typeorm-seeding method of loading factories, directly import factories.
 // This allows the ormconfig.ts to be correctly typed (because there's no need to specify "factories" anymore)
-import '../../user/user.factory';
-import '../event.factory';
+import '../src/user/user.factory';
+import '../src/events/event.factory';
 
 describe('PresenceController', () => {
     let app: INestApplication;
