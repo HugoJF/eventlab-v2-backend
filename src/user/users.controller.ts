@@ -1,5 +1,4 @@
 import {Controller} from '@nestjs/common';
-import {AppService} from '../app.service';
 import {Repository} from "typeorm";
 import {User} from "./user.entity";
 import {InjectRepository} from "@nestjs/typeorm";

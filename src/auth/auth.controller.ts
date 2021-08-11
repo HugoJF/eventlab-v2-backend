@@ -10,7 +10,7 @@ export class AuthController {
     constructor(
         private authService: AuthService,
         private userService: UsersService,
-        ) {
+    ) {
     }
 
     @UseGuards(JwtAuthGuard)

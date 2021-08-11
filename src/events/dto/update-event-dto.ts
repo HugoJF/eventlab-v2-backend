@@ -4,7 +4,7 @@ import {Type} from "class-transformer";
 export class UpdateEventDto {
     @IsOptional()
     title: string;
-    
+
     @IsOptional()
     description: string;
 
