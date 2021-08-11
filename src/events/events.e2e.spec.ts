@@ -67,21 +67,21 @@ describe('EventsController', () => {
     });
 
     it('GET /health - returns expected string', async () => {
-        request(app.getHttpServer())
+        await request(app.getHttpServer())
             .get('/health')
             .expect(200)
             .expect('We healthy')
     });
 
     it('POST events - returns HTTP 201', async () => {
-        request(app.getHttpServer())
+        await request(app.getHttpServer())
             .post('/events')
             .send(eventBase)
             .expect(201)
     });
 
     it('GET /events - returns the created event', async () => {
-        request(app.getHttpServer())
+        await request(app.getHttpServer())
             .get('/events')
             .expect(200)
             .expect(value => {
@@ -102,7 +102,7 @@ describe('EventsController', () => {
     });
 
     it('DELETE /event - deletes created event', async () => {
-        request(app.getHttpServer())
+        await request(app.getHttpServer())
             .delete('/events/1')
             .expect(204)
     });

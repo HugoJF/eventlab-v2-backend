@@ -4,12 +4,7 @@ WORKDIR /usr/src/app
 
 RUN apt-get update
 RUN apt-get upgrade
-RUN apt-get install -y curl wget
-
-ENV DOCKERIZE_VERSION v0.6.1
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+RUN apt-get install -y curl
 
 COPY package*.json ./
 COPY src src
@@ -18,14 +13,19 @@ COPY tsconfig.build.json .
 COPY tsconfig.json .
 
 RUN npm ci
-RUN npm install -g cross-env
+RUN npm run build
 
-ENV DB_CONNECTION=mysql
-ENV DB_HOST=db
-ENV DB_USERNAME=root
-ENV DB_PASSWORD=secret
-ENV DB_DATABASE=test
-ENV DB_PORT=3306
-ENV DB_SYNCHRONIZE=true
+ENV DB_CONNECTION=${DB_CONNECTION:-mysql}
+ENV DB_HOST=${DB_HOST:-172.17.0.1}
+ENV DB_USERNAME=${DB_USERNAME:-root}
+ENV DB_PASSWORD=${DB_PASSWORD:-secret}
+ENV DB_DATABASE=${DB_DATABASE:-test}
+ENV DB_PORT=${DB_PORT:-3306}
+ENV DB_SYNCHRONIZE=${DB_SYNCHRONIZE:-true}
 
-CMD [ "npm", "run", "test" ]
+EXPOSE 3000
+
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
+    CMD curl -f http://localhost:3000/health || exit 1
+
+CMD [ "npm", "run", "start:prod"]

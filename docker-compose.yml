@@ -7,5 +7,7 @@ services:
       MYSQL_DATABASE: test
   nest:
     depends_on: [db]
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-test
     command: sh -c "dockerize -wait tcp://db:3306 -timeout 15s -wait-retry-interval 3s npm run test"
